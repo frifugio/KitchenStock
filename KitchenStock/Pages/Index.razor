@@ -1,0 +1,76 @@
+﻿@page "/"
+
+@inject IStockRepository StockRepository
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+@using KitchenStock.Shared
+@using KitchenStock.Shared.Repositories
+
+<PageTitle>Kitchen Stock</PageTitle>
+
+<div class="container">
+    <h1 class="mt-4">Kitchen Stock</h1>
+    <blockquote class="blockquote mb-5 mt-2">
+        <footer class="blockquote-footer">Week n° @System.Globalization.ISOWeek.GetWeekOfYear(DateTime.Today)</footer>
+    </blockquote>
+
+    @if (stocks == null || !stocks.Any())
+    {
+        <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+        <span class="sr-only">Loading...</span>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tbody>
+                    @foreach (var stockItem in stocks)
+                    {
+                        <StockItemRow Stock="stockItem" />
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="d-flex flex-column">
+            <button class="btn btn-success" @onclick="SaveFoods"><span class="oi oi-aperture" title="save" aria-hidden="true"></span></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between mt-4">
+        <NavLink class="btn btn-primary" href="addstock"><span class="oi oi-plus p-2" title="add" aria-hidden="true"></span></NavLink>
+        <button class="btn btn-warning ml-1" @onclick="ResetAllQuantity"><span class="oi oi-loop-circular p-2" title="reset" aria-hidden="true"></span></button>
+    </div>
+</div>
+
+@code {
+    private StockItem[] stocks = Array.Empty<StockItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        stocks = await StockRepository.GetAllStockItemsAsync();
+    }
+
+    private async void SaveFoods()
+    {
+        foreach (var stock in stocks)
+        {
+            await StockRepository.UpdateStockItemAsync(stock);
+        }
+
+        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+    }
+
+    private async void ResetAllQuantity()
+    {
+        foreach (var stock in stocks)
+        {
+            stock.Quantity = 0;
+
+            await StockRepository.UpdateStockItemAsync(stock);
+        }
+
+        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+    }
+}

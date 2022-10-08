@@ -1,0 +1,54 @@
+﻿<tr>
+    <th scope="row" style="min-width: 150px">
+        <p>@Stock.Name</p>
+    </th>
+
+    <td>
+        <EditForm EditContext="editContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="input-group mb-3">
+                <label>Stock: </label>
+                <div class="input-group-prepend mx-2">
+                    <button class="btn btn-outline-secondary" type="button" @onclick="DecreaseAndValidate"><span class="oi oi-chevron-bottom" title="minus" aria-hidden="true"></span></button>
+                </div>
+                    <InputNumber @bind-Value="Stock.Quantity" disabled class="form-control" style="max-width: 100px" />
+                <div class="input-group-append mx-2">
+                    <button class="btn btn-outline-secondary" type="button" @onclick="IncreaseAndValidate"><span class="oi oi-chevron-top" title="plus" aria-hidden="true"></span></button>
+                </div>
+            </div>
+
+            <label class="my-3">
+                Next Refill Date:
+                <InputDate @bind-Value="Stock.NextRefillDate" class="mx-1"/>
+            </label>
+
+        </EditForm>
+    </td>
+</tr>
+
+
+@code {
+    [Parameter]
+    public StockItem Stock { get; set; } = new StockItem();
+
+    EditContext? editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(Stock);
+    }
+
+    private void IncreaseAndValidate()
+    {
+        Stock.Quantity++;
+        editContext?.Validate();
+    }
+
+    private void DecreaseAndValidate()
+    {
+        Stock.Quantity--;
+        editContext?.Validate();
+    }
+}

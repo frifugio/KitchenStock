@@ -1,0 +1,46 @@
+﻿@page "/AddStock"
+@inject IStockRepository StockRepository
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+@using KitchenStock.Shared.Repositories
+
+<div class="container">
+    <h3>Add a new item for the stock</h3>
+
+    <EditForm Model="@newStock" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <InputText @bind-Value=newStock.Name class="form-control" id="Name" />
+        </div>
+        <div class="form-group">
+            <label for="Quantity">Stock</label>
+            <InputNumber @bind-Value=newStock.Quantity class="form-control" id="Quantity" />
+        </div>
+        <div class="form-group">
+            <label for="NextRefillDate">Next Refill Date</label>
+            <InputDate @bind-Value=newStock.NextRefillDate class="form-control" id="NextRefillDate" />
+        </div>
+
+        <button type="submit" class="btn btn-primary"><span class="oi oi-aperture" title="save" aria-hidden="true"></span></button>
+    </EditForm>
+</div>
+
+@code {
+    StockItem newStock = new StockItem()
+        {
+            Id = Guid.NewGuid(),
+            Quantity = 0,
+            NextRefillDate = null
+        };
+
+    private async void OnValidSubmit(EditContext editContext)
+    {
+        await StockRepository.AddStockItemAsync(newStock);
+
+        NavManager.NavigateTo("/", true);
+    }
+}
