@@ -18,7 +18,7 @@ namespace KitchenStock.Shared
         [Range(0, 100)]
         public int Quantity { get; set; }
 
-        [JsonProperty("refillDate")]
+        [JsonProperty("nextRefillDate")]
         [FutureDate]
         public DateTime? NextRefillDate { get; set; }
     }
